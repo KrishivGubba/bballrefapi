@@ -21,3 +21,6 @@ To get started with this project, clone the repository and install the required 
 git clone https://github.com/yourusername/basketball-reference-api.git
 cd basketball-reference-api
 pip install -r requirements.txt
+
+Usage
+To run the API locally, execute the following command:
