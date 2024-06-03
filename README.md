@@ -34,19 +34,27 @@ This will start the Flask server on http://127.0.0.1:5000/.
 
 ## Endpoints
 
-### `/api/v1/player`
+### `/api/player-stats`
 
 - **Description**: Retrieves player data.
 - **Method**: GET
 - **Parameters**: 
-  - `player_id` (required): The unique identifier for the player.
+  - `player_name` (required): the name of the player.
 
-### `/api/v1/team`
+### `/api/team-year-roster`
 
 - **Description**: Retrieves team data.
 - **Method**: GET
 - **Parameters**: 
-  - `team_id` (required): The unique identifier for the team.
+  - `team_id` (required): The unique code for the team.
+  - `year` (required): the year the team played in.
+
+### `/api/player-prev-games`
+
+- **Description**: retrieves the player's past few games.
+- **Method**: GET
+- **Parameters**:
+  - `player_name` (required): the name of the player.
 
 ## Modules
 
