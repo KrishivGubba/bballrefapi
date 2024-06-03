@@ -1,3 +1,5 @@
+#This file contains all the currently developed endoints.
+#imports:
 from flask import Flask, redirect, request, render_template, session, jsonify
 from Player import Player
 from Team import TeamScraper
@@ -5,7 +7,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import psycopg2
 
-
+#initializing the flask app.
 app = Flask(__name__)
 
 #creating a rate limiter that will throttle api requests:
@@ -56,8 +58,9 @@ conn.commit()
 cur.close()
 conn.close()
 
+#first endpoint fetches a player's profile
 @app.route("/api/player-stats", methods = ["GET"])
-@limiter.limit("1 per 5 seconds")
+@limiter.limit("1 per 5 seconds") #rate limiting
 def getPlayerStats():
     data = request.json
     #checking to see that the player's name has been provided.
@@ -81,12 +84,12 @@ def getPlayerStats():
     cur.execute(query, (player_name,))
     # Fetch the result
     result = cur.fetchone()
-    if not result:
+    if not result: #in case the database does not hold the required player's data.
         try:
             playerObject = Player(playername=player_name)
         except:
             return jsonify("Error : player was not found.") , 404
-        player_details = playerObject.playerProfile()
+        player_details = playerObject.playerProfile() #attempting to scrape the data
         values = (
         player_details['Career 3FG%'],
         player_details['Career APG'],
@@ -121,14 +124,11 @@ def getPlayerStats():
             Season_FT_Percent, Season_Games, Season_PPG, Season_RPG, Shooting_arm
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        print(player_details)
         cur.execute(insert_query, values)
         conn.commit()
         conn.close()
-        #now we write 
         return jsonify(player_details), 200
     else:# in the case of the player's data existing within the dbase.
-        #TODO: need to format this into a proper dictionary that can be returned as a valid json.
         values = result
         result_keys = ['Career 3FG%', 'Career APG', 'Career FG%', 'Career FT%', 'Career Games', 'Career PPG', 
                        'Career RPG', 'College', 'Color', 'Experience', 'HS', 'Image', 'Name', 'Position', 'Season 3FG%', 
@@ -139,14 +139,16 @@ def getPlayerStats():
 
         return jsonify(res), 200
 
+#returns the whole roster for a team for a particular year.
 @app.route("/api/team-year-roster")
-@limiter.limit("1 per 5 seconds")
+@limiter.limit("1 per 5 seconds") #rate limiting
 def getRoster():
     data = request.json
-    if not data or "team" not in data or "year" not in data:
+    if not data or "team" not in data or "year" not in data: #checking to see that the body of the GET request is properly formatted
         return {"Error": "Provide a team code and year in the request body"}, 400
     team_code = data["team"]
     year = data["year"]
+    #connecting to the dbase
     conn = psycopg2.connect(
         host="my-api-db.cvogackoqyct.eu-north-1.rds.amazonaws.com",
         dbname="initial_db",
@@ -168,7 +170,7 @@ def getRoster():
     results = cur.fetchall()
     # Close the cursor and connection
 
-    if not results:
+    if not results: #in case the data does not exist within our database.
         teamscraper = TeamScraper(data["team"])
         results = teamscraper.getRoster(int(data["year"]))
         if not results:
@@ -185,18 +187,32 @@ def getRoster():
         conn.close()
         print("these are the res", results)
         return jsonify(results), 200
-    else:
+    else: # in case the data is within the dbase.
         returnable = {}
         for i in range(len(results)):
             returnable[results[i][0]] = results[i][1]
         return jsonify(returnable)
 
-# @app.route("")
+
+@app.route("/api/player-prev-games")
+@limiter.limite("1 per 5 seconds") #providing the rate limit.
+def getLastFewGames():
+    data = request.json
+    #checking to see that the request body isformatted properly
+    if not data or "name" not in data:
+        return {"Error":"Reformat the request body"}, 400
+    playerName = data['name']
+    #creating a player object to start scraping the stats
+    player = Player(playerName)
+    try:
+        games = player.lastFewGames()
+        return jsonify(games)
+    except:
+        return {"Error" : "An error occurred while scraping data."}
+
+
 
     
-
-        
-
 
 if __name__=="__main__":
     app.run(debug=True)
