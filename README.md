@@ -56,6 +56,17 @@ This will start the Flask server on http://127.0.0.1:5000/.
 - **Parameters**:
   - `player_name` (required): the name of the player.
 
+## Handling Rate Limits
+
+Basketball reference allows data to be scraped off its website, however it rate limits quite strictly. More than a few attempts
+at scraping within a few seconds can get your IP banned for over an hour. To circumvent this, the project has its own PostgreSQL
+database setup. When the api receives a GET request, checks its database to see if the dbase holds the queried data. If it does,
+then the data is immediately fetched from the database without attempting scraping of any sort. If it does not, THEN a web
+scraping script is run, after which the newly scraped data is added to the database (so that if it is ever requested again, one
+need not web scrape again).
+Additionally, to avoid the IP ban, this API has been rate limited to throttle requests to about 1 every 5 seconds.
+The above methods have been implemented in order to effectively get and provide data from the popular website.
+
 ## Modules
 
 ### `Player.py`
