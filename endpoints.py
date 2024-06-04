@@ -58,6 +58,10 @@ conn.commit()
 cur.close()
 conn.close()
 
+@app.route("/")
+def getsumn():
+    return "hi"
+
 #first endpoint fetches a player's profile
 @app.route("/api/player-stats", methods = ["GET"])
 @limiter.limit("1 per 5 seconds") #rate limiting
@@ -195,7 +199,7 @@ def getRoster():
 
 
 @app.route("/api/player-prev-games")
-@limiter.limite("1 per 5 seconds") #providing the rate limit.
+@limiter.limit("1 per 5 seconds") #providing the rate limit.
 def getLastFewGames():
     data = request.json
     #checking to see that the request body isformatted properly
@@ -210,9 +214,5 @@ def getLastFewGames():
     except:
         return {"Error" : "An error occurred while scraping data."}
 
-
-
-    
-
 if __name__=="__main__":
-    app.run(debug=False, host = "0.0.0.0")
+    app.run(debug=True)
