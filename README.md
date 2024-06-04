@@ -4,7 +4,7 @@
 
 This project is a public API designed to provide basketball data from the website [basketball-reference.com](https://www.basketball-reference.com). It uses Flask for hosting the endpoints, AWS RDS for PostgreSQL database hosting, and will be deployed using Zeet. The API currently has two endpoints, with more planned for future releases.
 
-NOTE: the database is being hosted on AWS RDS currently, but the endpoint are still on the localhost - they are not publicly available yet.
+NOTE: the database is being hosted on AWS RDS currently, but the endpoints are still on the localhost - they are not publicly available yet.
 
 ## Table of Contents
 
