@@ -135,7 +135,7 @@ class Player:
                 "HS": HS,
                 "Experience" : experience,
                 "Image": playerImage,
-                "Color":color,
+                "TeamColor":color,
                 "Season Games":seasonGames,
                 "Career Games": careerGames,
                 "Career PPG": careerPPG,
