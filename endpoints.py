@@ -135,7 +135,7 @@ def getPlayerStats():
     else:# in the case of the player's data existing within the dbase.
         values = result
         result_keys = ['Career 3FG%', 'Career APG', 'Career FG%', 'Career FT%', 'Career Games', 'Career PPG', 
-                       'Career RPG', 'College', 'Color', 'Experience', 'HS', 'Image', 'Name', 'Position', 'Season 3FG%', 
+                       'Career RPG', 'College', 'TeamColor', 'Experience', 'HS', 'Image', 'Name', 'Position', 'Season 3FG%', 
                        'Season APG', 'Season FG%', 'Season FT%', 'Season Games', 'Season PPG', 'Season RPG', 'Shooting arm']
         res = {}
         for i in range(len(result_keys)):
