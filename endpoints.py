@@ -103,7 +103,7 @@ def getPlayerStats():
         player_details['Career PPG'],
         player_details['Career RPG'],
         player_details['College'],
-        player_details['Color'],
+        player_details['TeamColor'],
         player_details['Experience'],
         player_details['HS'],
         player_details['Image'],
@@ -131,6 +131,7 @@ def getPlayerStats():
         cur.execute(insert_query, values)
         conn.commit()
         conn.close()
+        
         return jsonify(player_details), 200
     else:# in the case of the player's data existing within the dbase.
         values = result
