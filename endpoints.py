@@ -61,7 +61,7 @@ conn.close()
 @app.route("/")
 def getsumn():
     return "hi"
-
+#slslslsls
 #first endpoint fetches a player's profile
 @app.route("/api/player-stats", methods = ["GET"])
 @limiter.limit("1 per 5 seconds") #rate limiting
