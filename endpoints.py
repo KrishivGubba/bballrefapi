@@ -73,15 +73,14 @@ conn.close()
 @app.route("/api/player-stats", methods = ["GET"])
 @limiter.limit("1 per 5 seconds") #rate limiting
 def getPlayerStats():
-    data = request.json
-    #checking to see that the player's name has been provided.
-    if not data:
-        return {"Error": "Provide a player name in the request body"}, 400
-    #checking to see that the "name" key exists within the request data
-    if "name" not in data:
-        return {"Error": "Request formatting error"}, 400
-    player_name = data['name'].lower()
-        #first we will check to see if the database already has the table or not.
+    #adhering to RESTful standards by rejecting requests with payload.
+    if request.data: return {"Error":"GET request should not have a request body."}
+
+    player_name = request.args.get("name").lower()
+    #checking to see that the player's name has been provided as req param.
+    if not player_name:
+        return {"Error": "Provide a player name as a request parameter"}, 400
+    #first we will check to see if the database already has the table or not.
     conn = psycopg2.connect(
         host = db_host, dbname = db_name, user=db_user, password = db_password, port= db_port
     )
