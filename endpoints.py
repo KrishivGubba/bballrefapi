@@ -6,8 +6,8 @@ from Team import TeamScraper
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import psycopg2
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
 #initializing the flask app.
 app = Flask(__name__)
@@ -19,13 +19,14 @@ limiter = Limiter(
     default_limits = ["1 per 5 seconds"]
 )
 
-load_dotenv()
+load_dotenv
 
 db_host = os.getenv('DB_HOST')
 db_name = os.getenv('DB_NAME')
 db_user = os.getenv('DB_USER')
 db_password = os.getenv('DB_PASSWORD')
 db_port = os.getenv('DB_PORT')
+
 
 # creating the table on postgres:
 conn = psycopg2.connect(host = db_host, dbname = db_name, user=db_user, password = db_password, port= db_port)
@@ -82,11 +83,7 @@ def getPlayerStats():
     player_name = data['name'].lower()
         #first we will check to see if the database already has the table or not.
     conn = psycopg2.connect(
-        host="my-api-db.cvogackoqyct.eu-north-1.rds.amazonaws.com",
-        dbname="initial_db",
-        user="postgres",
-        password="12345678",
-        port=5432
+        host = db_host, dbname = db_name, user=db_user, password = db_password, port= db_port
     )
     cur = conn.cursor()
     #now construct query to check if this player exists within the database.
@@ -161,11 +158,7 @@ def getRoster():
     year = data["year"]
     #connecting to the dbase
     conn = psycopg2.connect(
-        host="my-api-db.cvogackoqyct.eu-north-1.rds.amazonaws.com",
-        dbname="initial_db",
-        user="postgres",
-        password="12345678",
-        port=5432
+        host = db_host, dbname = db_name, user=db_user, password = db_password, port= db_port
     )
     # Create a cursor object
     cur = conn.cursor()
