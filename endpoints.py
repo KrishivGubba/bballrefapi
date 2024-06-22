@@ -73,15 +73,14 @@ conn.close()
 @app.route("/api/player-stats", methods = ["GET"])
 @limiter.limit("1 per 5 seconds") #rate limiting
 def getPlayerStats():
-    data = request.json
-    #checking to see that the player's name has been provided.
-    if not data:
-        return {"Error": "Provide a player name in the request body"}, 400
-    #checking to see that the "name" key exists within the request data
-    if "name" not in data:
-        return {"Error": "Request formatting error"}, 400
-    player_name = data['name'].lower()
-        #first we will check to see if the database already has the table or not.
+    #adhering to RESTful standards by rejecting requests with payload.
+    if request.data: return {"Error":"GET request should not have a request body."}, 400
+
+    player_name = request.args.get("name").lower()
+    #checking to see that the player's name has been provided as req param.
+    if not player_name:
+        return {"Error": "Provide a player name as a request parameter"}, 400
+    #first we will check to see if the database already has the table or not.
     conn = psycopg2.connect(
         host = db_host, dbname = db_name, user=db_user, password = db_password, port= db_port
     )
@@ -151,11 +150,11 @@ def getPlayerStats():
 @app.route("/api/team-year-roster")
 @limiter.limit("1 per 5 seconds") #rate limiting
 def getRoster():
-    data = request.json
-    if not data or "team" not in data or "year" not in data: #checking to see that the body of the GET request is properly formatted
-        return {"Error": "Provide a team code and year in the request body"}, 400
-    team_code = data["team"]
-    year = data["year"]
+    if request.data: return {"Error":"GET request should not have a request body."}, 400
+    team_code = request.args.get("team")
+    year = request.args.get("year")
+    if not team_code or not year: #checking to see that the query params of the GET request is properly formatted
+        return {"Error": "Provide a team code and year in the query parameters"}, 400
     #connecting to the dbase
     conn = psycopg2.connect(
         host = db_host, dbname = db_name, user=db_user, password = db_password, port= db_port
@@ -175,8 +174,8 @@ def getRoster():
     # Close the cursor and connection
 
     if not results: #in case the data does not exist within our database.
-        teamscraper = TeamScraper(data["team"])
-        results = teamscraper.getRoster(int(data["year"]))
+        teamscraper = TeamScraper(teamcode=team_code)
+        results = teamscraper.getRoster(int(year))
         if not results:
             return {"Error" : "Could not find queried data."}
         #now must add the results to the sql dbase.
