@@ -67,6 +67,8 @@ then the data is immediately fetched from the database without attempting scrapi
 scraping script is run, after which the newly scraped data is added to the database (so that if it is ever requested again, one
 need not web scrape again).
 Additionally, to avoid the IP ban, this API has been rate limited to throttle requests to about 1 every 5 seconds.
+Finally, a proxy rotation feature has been recently implemented. If any of the endpoints receive a request for data, the web 
+scraper is routed through a randomly chosen proxy so as to circumvent IP banning from basketballreference.com .
 The above methods have been implemented in order to effectively get and provide data from the popular website.
 
 ## Modules
