@@ -3,6 +3,7 @@
 #imports:
 from bs4 import BeautifulSoup
 import requests
+import random
 
 class Player:
     #class initialization
@@ -13,6 +14,12 @@ class Player:
         self.url = None
         self.soup = None
         self._initialize_soup()
+
+    @staticmethod
+    def getRandomProxy():
+        with open("proxies.txt","r") as file:
+            proxies = file.readlines()
+        return random.choice(proxies).strip()
 
     #method to set the player code (this is to locate the specific url on basketball-reference that holds the player's data.)
     def setPlayerCode(self):
@@ -29,8 +36,26 @@ class Player:
 
     #initializing the beautiful soup object that will scrape the data.
     def _initialize_soup(self):
+        proxydetails = Player.getRandomProxy().split(":")
+        hosted = proxydetails[0]+":"+proxydetails[1]
+        username = proxydetails[2]
+        password = proxydetails[3]
+        proxy = f"http://{username}:{password}@{hosted}" 
+        respon = requests.get('https://ip.smartproxy.com/json', #this url return a json with the proxy details
+                                                  proxies={
+                        'http':proxy,
+                        'https':proxy
+                    })
+        details = respon.json()
+        print("Request routed through ", details["city"]["name"], details["city"]["state"])
         try:
-            self.url = requests.get(f"https://www.basketball-reference.com/players/{self.playerletter}/{self.playercode}01.html")
+            self.url = requests.get(
+                url=f"https://www.basketball-reference.com/players/{self.playerletter}/{self.playercode}01.html",
+                    proxies={
+                        'http':proxy,
+                        'https':proxy
+                    }
+                )
             if self.url.status_code!=200:
                 raise Exception("Player data not found.")
             self.soup = BeautifulSoup(self.url.text, "html.parser")
@@ -167,5 +192,3 @@ class Player:
         finaldata.pop(0)
         return finaldata
 
-player = Player("zach lavine")
-print(player.lastFewGames())
