@@ -1,17 +1,48 @@
 # Importing necessary libraries
 from bs4 import BeautifulSoup
 import requests
+import random
 
 class TeamScraper:
     def __init__(self, teamcode):
         # Initialize the TeamScraper with the team code (e.g., Chicago Bulls have the team code CHI)
         self.teamcode = teamcode
 
+    @staticmethod
+    def getRandomProxy():
+        with open("proxies.txt","r") as file:
+            proxies = file.readlines()
+        return random.choice(proxies).strip()
+
     # Create the BeautifulSoup object to scrape the required data from a given URL
     def initializeSoup(self, url):
-        page = requests.get(url)
-        soup = BeautifulSoup(page.text, "html.parser")
-        return soup
+        proxydetails = TeamScraper.getRandomProxy().split(":")
+        hosted = proxydetails[0]+":"+proxydetails[1]
+        username = proxydetails[2]
+        password = proxydetails[3]
+        proxy = f"http://{username}:{password}@{hosted}" 
+        respon = requests.get('https://ip.smartproxy.com/json', #this url return a json with the proxy details
+                    proxies={
+                        'http':proxy,
+                        'https':proxy
+                    }
+                )
+        details = respon.json()
+        print("Request routed through ", details["city"]["name"], details["city"]["state"])
+        try:
+            page = requests.get(
+                url,
+                proxies={
+                        'http':proxy,
+                        'https':proxy
+                    }
+                )
+            soup = BeautifulSoup(page.text, "html.parser")
+            return soup
+        except:
+            print(f"Error fetching team data.")
+
+            
 
     # Get the roster of the team for a specified year
     def getRoster(self, year):
@@ -100,7 +131,3 @@ class TeamScraper:
             lst.append(i.find_all("td", attrs={"data-stat":"win_loss_pct"}))
             seasonLst.append(i.find("th", attrs={"data-stat":"season"}).find("a"))
         lst.pop(0)
-       
-
-team = TeamScraper("CHI")
-print(team.getRoster(1999))
